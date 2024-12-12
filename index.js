@@ -268,7 +268,7 @@ async function run() {
       }
     });
 
-    app.post("/add-vocabulary", verifyToken, async () => {
+    app.post("/add-vocabulary", verifyToken, async (req, res) => {
       try {
         const user_role = req.decoded.role;
         const data = req.body;
@@ -293,7 +293,7 @@ async function run() {
         }
         res.send({ success: true, data: result });
       } catch (error) {
-        console.log("create vocabulary route");
+        console.log("create vocabulary route", error);
       }
     });
 
@@ -324,17 +324,20 @@ async function run() {
       }
     });
 
-    app.delete("/delete-vocabulary", verifyToken, async (req, res) => {
+    app.post("/delete-vocabulary", verifyToken, async (req, res) => {
       try {
         const user_role = req.decoded.role;
-        const id = req.query.id;
         const data = req.body;
         if (user_role !== 1)
           return res.send({
             success: false,
             message: "only admin can add new tutorial",
           });
-        const result = await vocabulary.deleteOne({ _id: new ObjectId(id) });
+        console.log(data);
+
+        const result = await vocabulary.deleteOne({
+          _id: new ObjectId(data._id),
+        });
         const findLesson = await lessons.findOne({
           _id: new ObjectId(data.lessonNo),
         });
@@ -350,6 +353,23 @@ async function run() {
         res.send({ success: true, data: result });
       } catch (error) {}
     });
+
+    app.get("/get-vocabulary", verifyToken, async (_, res) => {
+      try {
+        const result = await vocabulary.find().toArray();
+        res.send(result);
+      } catch (error) {}
+    });
+
+    app.get("/vocabulary",verifyToken, async(req, res)=>{
+      try {
+        const id = req.query.id;
+        const find = await vocabulary.findOne({_id:new ObjectId(id)});
+        res.send(find)
+      } catch (error) {
+        
+      }
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
