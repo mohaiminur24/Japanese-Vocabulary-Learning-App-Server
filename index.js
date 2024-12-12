@@ -317,10 +317,38 @@ async function run() {
             lessonNo: data.lessonNo,
           },
         };
-        const result = await vocabulary.updateOne(query,update)
+        const result = await vocabulary.updateOne(query, update);
+        res.send({ success: true, data: result });
       } catch (error) {
         console.warn("update vocabulary route");
       }
+    });
+
+    app.delete("/delete-vocabulary", verifyToken, async (req, res) => {
+      try {
+        const user_role = req.decoded.role;
+        const id = req.query.id;
+        const data = req.body;
+        if (user_role !== 1)
+          return res.send({
+            success: false,
+            message: "only admin can add new tutorial",
+          });
+        const result = await vocabulary.deleteOne({ _id: new ObjectId(id) });
+        const findLesson = await lessons.findOne({
+          _id: new ObjectId(data.lessonNo),
+        });
+        if (findLesson) {
+          const q = { _id: new ObjectId(findLesson._id) };
+          const u = {
+            $set: {
+              count: findLesson.count - 1,
+            },
+          };
+          await lessons.updateOne(q, u);
+        }
+        res.send({ success: true, data: result });
+      } catch (error) {}
     });
 
     // Send a ping to confirm a successful connection
