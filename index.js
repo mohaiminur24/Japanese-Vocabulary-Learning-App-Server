@@ -228,6 +228,47 @@ async function run() {
       }
     });
 
+    app.post("/update-lesson", verifyToken, async (req, res) => {
+      try {
+        const user_role = req.decoded.role;
+        const data = req.body;
+        if (user_role !== 1)
+          return res.send({
+            success: false,
+            message: "only admin can add new tutorial",
+          });
+        const query = { _id: new ObjectId(data.id) };
+        const entity = {
+          $set: {
+            title: data.title,
+          },
+          $set: {
+            description: data.description,
+          },
+        };
+        const result = await lessons.updateOne(query, entity);
+        res.send({ success: true, data: result });
+      } catch (error) {
+        console.log("update lesson route");
+      }
+    });
+
+    app.delete("/delete-lesson", verifyToken, async (req, res) => {
+      try {
+        const user_role = req.decoded.role;
+        const id = req.query.id;
+        if (user_role !== 1)
+          return res.send({
+            success: false,
+            message: "only admin can add new tutorial",
+          });
+        const result = await lessons.deleteOne({ _id: new ObjectId(id) });
+        res.send({ success: true, data: result });
+      } catch (error) {
+        console.log("delete lesson route");
+      }
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
