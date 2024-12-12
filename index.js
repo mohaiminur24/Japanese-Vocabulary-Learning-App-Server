@@ -237,12 +237,11 @@ async function run() {
             success: false,
             message: "only admin can add new tutorial",
           });
+
         const query = { _id: new ObjectId(data.id) };
         const entity = {
           $set: {
             title: data.title,
-          },
-          $set: {
             description: data.description,
           },
         };
@@ -266,6 +265,22 @@ async function run() {
         res.send({ success: true, data: result });
       } catch (error) {
         console.log("delete lesson route");
+      }
+    });
+
+    app.post("/add-vocabulary", verifyToken, async () => {
+      try {
+        const user_role = req.decoded.role;
+        const data = req.body;
+        if (user_role !== 1)
+          return res.send({
+            success: false,
+            message: "only admin can add new tutorial",
+          });
+        const result = await vocabulary.insertOne(data);
+        res.send({ success: true, data: result });
+      } catch (error) {
+        console.log("create vocabulary route");
       }
     });
 
