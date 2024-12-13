@@ -173,7 +173,7 @@ async function run() {
           },
         };
         const result = await users.updateOne(query, update);
-        res.send(result);
+        res.send({ success: true, data: result });
       } catch (error) {
         console.log("update user route", error);
       }
@@ -189,7 +189,7 @@ async function run() {
             message: "only admin can add new tutorial",
           });
         const result = await users.deleteOne({ _id: new ObjectId(id) });
-        res.send(result);
+        res.send({ success: true, data: result });
       } catch (error) {
         console.log("delete-user route");
       }
@@ -360,15 +360,13 @@ async function run() {
       } catch (error) {}
     });
 
-    app.get("/vocabulary",verifyToken, async(req, res)=>{
+    app.get("/vocabulary", verifyToken, async (req, res) => {
       try {
         const id = req.query.id;
-        const find = await vocabulary.findOne({_id:new ObjectId(id)});
-        res.send(find)
-      } catch (error) {
-        
-      }
-    })
+        const find = await vocabulary.findOne({ _id: new ObjectId(id) });
+        res.send(find);
+      } catch (error) {}
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
