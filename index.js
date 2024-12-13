@@ -332,8 +332,6 @@ async function run() {
             success: false,
             message: "only admin can add new tutorial",
           });
-        console.log(data);
-
         const result = await vocabulary.deleteOne({
           _id: new ObjectId(data._id),
         });
