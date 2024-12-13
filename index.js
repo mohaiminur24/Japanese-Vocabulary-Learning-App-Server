@@ -300,14 +300,13 @@ async function run() {
     app.post("/update-vocabulary", verifyToken, async (req, res) => {
       try {
         const user_role = req.decoded.role;
-        const id = req.query.id;
         const data = req.body;
         if (user_role !== 1)
           return res.send({
             success: false,
             message: "only admin can add new tutorial",
           });
-        const query = { _id: new ObjectId(id) };
+        const query = { _id: new ObjectId(data.id) };
         const update = {
           $set: {
             word: data.word,
